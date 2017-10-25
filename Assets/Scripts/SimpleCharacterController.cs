@@ -18,5 +18,7 @@ public class SimpleCharacterController : MonoBehaviour {
 		float ver = Input.GetAxis("Vertical");
 
 		rb.AddForce(new Vector2(hor, ver) * speed);
+
+		rb.velocity *= .2f;
 	}
 }

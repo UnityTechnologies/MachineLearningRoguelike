@@ -20,6 +20,6 @@ MonoBehaviour:
   - {fileID: 21300300, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
   - {fileID: 21300298, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
   - {fileID: 21300298, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
-  m_MinSpeed: 1
-  m_MaxSpeed: 1
+  m_MinSpeed: 0.4
+  m_MaxSpeed: 0.5
   m_AnimationStartTime: 0

@@ -38,6 +38,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Ground
+    uniqueID: 1891841997
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Low
+    uniqueID: 3581370487
+    locked: 0
+  - name: Characters
+    uniqueID: 666897453
+    locked: 0
+  - name: High
+    uniqueID: 1422248273
     locked: 0

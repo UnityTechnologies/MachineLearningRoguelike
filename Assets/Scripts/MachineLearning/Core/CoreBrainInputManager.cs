@@ -21,8 +21,6 @@ public class CoreBrainInputManager : ScriptableObject, CoreBrain
     [SerializeField]
     /// Contains the mapping from input to continuous actions
     private ContinuousPlayerAction[] continuousPlayerActions;
-    [SerializeField]
-    private int defaultAction = -1;
 
     /// Reference to the brain that uses this CoreBrainPlayer
     public Brain brain;

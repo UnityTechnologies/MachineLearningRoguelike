@@ -37,10 +37,11 @@ GameObject:
   m_Component:
   - component: {fileID: 4416867438822860}
   - component: {fileID: 50523603067616226}
-  - component: {fileID: 114459438324676788}
+  - component: {fileID: 95345802332914774}
+  - component: {fileID: 114985307689592944}
   m_Layer: 0
   m_Name: Character
-  m_TagString: Untagged
+  m_TagString: Agent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,7 +108,24 @@ CapsuleCollider2D:
   m_Offset: {x: -0.000000003798739, y: -0.2818662}
   m_Size: {x: 0.74760425, y: 0.43626773}
   m_Direction: 1
---- !u!114 &114459438324676788
+--- !u!95 &95345802332914774
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1860824318153056}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a7f3ee887ffb549569e18d12b58f7992, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114985307689592944
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -115,12 +133,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1860824318153056}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ac4bfb5c427244a0b0ffbadbe63ad68, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f32730ced65f4d539e5588d6564e5fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
   observations: []
-  maxStep: 0
+  maxStep: 2000
   resetOnDone: 1
   reward: 0
   done: 0
@@ -133,6 +151,8 @@ MonoBehaviour:
   speed: 100
   startingHealth: 100
   startingMana: 50
+  attackCooldown: 1
+  attackDamage: 5
 --- !u!212 &212346943802769866
 SpriteRenderer:
   m_ObjectHideFlags: 1

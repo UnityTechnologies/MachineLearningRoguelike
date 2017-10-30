@@ -25,6 +25,8 @@ public class RoguelikeAgent : Agent
 	private Collider2D damageCollider;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
+	private Vector2 startPosition, enemyPosition;
+	private RoguelikeAgent enemyAgent;
 
     protected virtual void Awake()
 	{
@@ -32,7 +34,38 @@ public class RoguelikeAgent : Agent
 		animator = GetComponent<Animator>();
 		graphicsSpriteRenderer = transform.Find("Graphics").GetComponent<SpriteRenderer>();
 		doAttackHash = Animator.StringToHash("DoAttack");
+		startPosition = transform.position;
 		AgentReset(); //will reset some key variables
+		StartCoroutine(SearchForEnemy());
+	}
+
+	private IEnumerator SearchForEnemy()
+	{
+		while (true)
+		{
+			RoguelikeAgent[] allAgents = GameObject.FindObjectsOfType<RoguelikeAgent>();
+			
+			if (allAgents.Length != 0)
+			{
+				float nearestDistance = 1000f;
+				int nearestAgentIndex = 0;
+
+				for (int i = 0; i < allAgents.Length; i++)
+				{
+					float currentDistance = (allAgents[i].transform.position - this.transform.position).sqrMagnitude; 
+					if (allAgents[i] != this &&
+						currentDistance < nearestDistance)
+					{
+						nearestAgentIndex = i;
+						nearestDistance = currentDistance;
+					}
+				}
+
+				enemyAgent = allAgents[nearestAgentIndex];
+			}
+			
+			yield return new WaitForSeconds(1f);
+		}
 	}
 
 	public override List<float> CollectState()
@@ -42,33 +75,42 @@ public class RoguelikeAgent : Agent
 		state.Add(transform.position.y);
 		state.Add(health);
 		state.Add((canAttack) ? 1f : 0f);
+		state.Add((enemyAgent != null) ? 1f : 0f);
+		state.Add((enemyAgent != null) ? enemyAgent.transform.position.x : 0f);
+		state.Add((enemyAgent != null) ? enemyAgent.transform.position.y : 0f);
 		return state;
 	}
 
 	public override void AgentStep(float[] act)
 	{
 		//movment vector is valorized
-		movementInput.x = act[0];
-		movementInput.y = act[1];
+		movementInput.x = Mathf.Clamp(act[0], -1f, 1f);
+		movementInput.y = Mathf.Clamp(act[1], -1f, 1f);
 		rb.AddForce(movementInput * speed, ForceMode2D.Force);
 
-		float attack = act[2];
+		float attack = Mathf.Clamp(act[2], -1f, 1f);
 		if(attack > 0f)
 		{
 			if(canAttack)
 			{
 				Attack();
+				reward += .1f;
 			}
 			else
 			{
-				reward = -.5f; //penalty for trying to attack when it can't
+				reward -= .005f; //penalty for trying to attack when it can't
 			}
 		}
-
-		if(reward == 0f)
+		else
 		{
-			reward = -.05f; //default penalty to push the Agent to act
+			reward -= .005f;
 		}
+
+		//if(reward == 0f)
+		//{
+			//reward -= .001f; //default penalty to push the Agent to act
+		//}
+		rb.velocity *= .05f;
 	}
 
 	protected virtual void Attack()
@@ -99,12 +141,11 @@ public class RoguelikeAgent : Agent
 			isTargetDead = target.ReceiveDamage(attackDamage);
 			if(isTargetDead)
 			{
-				reward = 1f;
-				done = true;
+				reward += 1f;
 			}
 			else
 			{
-				reward = .5f;
+				reward += .5f;
 			}
 		}
 
@@ -117,11 +158,13 @@ public class RoguelikeAgent : Agent
 		if(health <= 0)
 		{
 			Die();
+			reward -= 1f;
 			return true;
 		}
 		else
 		{
 			StartCoroutine(HitFlicker());
+			reward -= .1f;
 			return false;
 		}
     }
@@ -132,7 +175,6 @@ public class RoguelikeAgent : Agent
 		{
 			//During training
 			done = true;
-			reward = -1f;
 		}
 		else
 		{
@@ -161,7 +203,7 @@ public class RoguelikeAgent : Agent
 
     protected virtual void FixedUpdate()
 	{
-		rb.velocity *= .05f;
+		
 	}
 
 	public override void AgentReset()
@@ -169,6 +211,7 @@ public class RoguelikeAgent : Agent
 		rb.velocity = Vector3.zero;
 		health = startingHealth;
 		mana = startingMana;
+		transform.position = startPosition;
 	}
 
 	public override void AgentOnDone()

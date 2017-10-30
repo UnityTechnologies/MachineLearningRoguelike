@@ -195,8 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
-  observations:
-  - {fileID: 0}
+  observations: []
   maxStep: 100
   resetOnDone: 1
   reward: 0

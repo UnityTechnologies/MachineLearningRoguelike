@@ -190,9 +190,9 @@ MonoBehaviour:
   DisplayBrainType: 0
   DisplayFrameCount: 0
   DisplayCurrentReward: 1
-  DisplayMaxReward: 1
-  DisplayState: 1
-  DisplayAction: 1
+  DisplayMaxReward: 0
+  DisplayState: 0
+  DisplayAction: 0
 --- !u!114 &114553395094490262
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -232,6 +232,7 @@ MonoBehaviour:
   startingMana: 0
   attackCooldown: 1
   attackDamage: 5
+  enemyAgent: {fileID: 0}
 --- !u!212 &212237051663139144
 SpriteRenderer:
   m_ObjectHideFlags: 1

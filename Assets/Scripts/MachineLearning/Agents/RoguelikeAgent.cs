@@ -20,14 +20,16 @@ public class RoguelikeAgent : Agent
 	protected int mana;
 
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
-	private float lastHitTime, lastAttackTime; //used to verify cooldowns
+	private float lastHitTime; //used to verify cooldowns
 	private int doAttackHash;
 	private Collider2D damageCollider;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startPosition;
-	private float movementDelta;
 	private Vector3 prevPosition;
+	private Rigidbody2D enemyAgentRb;
+	private bool isHealing;
+	private float enemyDistance, closestEnemyDistance;
 
 	public RoguelikeAgent enemyAgent;
 
@@ -38,66 +40,147 @@ public class RoguelikeAgent : Agent
 		graphicsSpriteRenderer = transform.Find("Graphics").GetComponent<SpriteRenderer>();
 		doAttackHash = Animator.StringToHash("DoAttack");
 		startPosition = transform.position;
+		if(enemyAgent != null)
+		{
+			enemyAgentRb = enemyAgent.GetComponent<Rigidbody2D>();
+		}
 		AgentReset(); //will reset some key variables
 	}
 
 	public override List<float> CollectState()
 	{
 		List<float> state = new List<float>();
+		//Agent data
 		state.Add(transform.position.x);
 		state.Add(transform.position.y);
 		state.Add(health);
-		state.Add((canAttack) ? 1f : 0f);
-		state.Add((enemyAgent != null) ? 1f : 0f);
-		state.Add((enemyAgent != null) ? enemyAgent.transform.position.x : 0f);
-		state.Add((enemyAgent != null) ? enemyAgent.transform.position.y : 0f);
-		state.Add(movementDelta);
+		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
+		state.Add(rb.velocity.x);
+		state.Add(rb.velocity.y);
+
+		//Enemy data
+		if(enemyAgent != null)
+		{
+			state.Add(1f); //does this Agent have an enemy?
+			state.Add(enemyAgent.transform.position.x);
+			state.Add(enemyAgent.transform.position.y);
+			state.Add(enemyAgentRb.velocity.x);
+			state.Add(enemyAgentRb.velocity.y);
+			state.Add(enemyDistance); //squared distance from the enemy
+		}
+		else
+		{
+			//enemy data is set to zero
+			state.Add(0f);
+			state.Add(0f);
+			state.Add(0f);
+			state.Add(0f);
+			state.Add(0f);
+			state.Add(0f);
+		}
 		return state;
 	}
 
 	public override void AgentStep(float[] act)
 	{
-		//movement vector is valorized
+		//MOVEMENT
 		movementInput.x = Mathf.Clamp(act[0], -1f, 1f);
 		movementInput.y = Mathf.Clamp(act[1], -1f, 1f);
+
 		rb.AddForce(movementInput * speed, ForceMode2D.Force);
+		
 
-		movementDelta = (prevPosition - transform.position).sqrMagnitude;
-		if (movementDelta > 0f)
+		//DISTANCE CHECK
+		if(enemyAgent != null)
 		{
-			reward += .001f;
+			float newEnemyDistance = Vector3.SqrMagnitude(enemyAgent.transform.position - this.transform.position);
+			//is the Agent aggressive or is it fleeing?
+			if(health > startingHealth * .5f)
+			{
+				//aggressive behaviour
+				if(newEnemyDistance < enemyDistance) //moving closer
+				{
+					if(newEnemyDistance < closestEnemyDistance) //to avoid exploitation (back and forth)
+					{
+						reward += .1f; //reward the hunt
+					}
+					else
+					{
+						reward -= .05f;
+					}
+				}
+			}
+			else
+			{
+				//(is its health below half of the original?)
+				if(newEnemyDistance > enemyDistance) //getting further
+				{
+					reward += .1f; //reward the escape
+				}
+			}
+			enemyDistance = newEnemyDistance; //cached for CollectState
+			closestEnemyDistance = enemyDistance;
 		}
-		prevPosition = transform.position;
 
-		float attack = Mathf.Clamp(act[2], -1f, 1f);
+
+		//ATTACK
+		float attack = act[2];
 		if(attack > 0f)
 		{
 			if(canAttack)
 			{
-				Attack();
+				StartCoroutine(DoAttack());
 			}
 			else
 			{
 				reward -= .001f; //penalty for trying to attack when it can't
 			}
+
+			//stop healing, if it was
+			if(isHealing)
+			{
+				StopCoroutine(Heal());
+				isHealing = false;
+			}
+		}
+		else
+		{
+			//if not attacking, can start healing
+			if(!isHealing
+				&& health < startingHealth)
+			{
+				StartCoroutine(Heal());
+			}
 		}
 
-		rb.velocity *= .05f;
+
+		//FINAL OPERATIONS
+		rb.velocity *= .5f; //fake drag
+		//reward -= .1f; //base negative reward, to push the agent to act
 	}
 
-	protected virtual void Attack()
+	private IEnumerator Heal()
 	{
-		if(canAttack)
+		isHealing = true;
+		
+		while(health < startingHealth)
 		{
-			StartCoroutine(DoAttack());
+			yield return new WaitForSeconds(2f);
+			
+			//heal and get a reward for it
+			health++;
+			reward += .05f;
 		}
+
+		closestEnemyDistance = Mathf.Infinity; //this will allow again a reward for getting closer
+		isHealing = false;
 	}
 
     private IEnumerator DoAttack()
     {
 		canAttack = false;
-		lastAttackTime = Time.time;
         animator.SetTrigger(doAttackHash);
+		rb.AddForce(movementInput * speed * .5f, ForceMode2D.Impulse); //add a strong push
 
 		yield return new WaitForSeconds(attackCooldown);
 
@@ -184,7 +267,7 @@ public class RoguelikeAgent : Agent
 		health = startingHealth;
 		mana = startingMana;
 		transform.position = startPosition;
-		prevPosition = transform.position;
+		closestEnemyDistance = Mathf.Infinity;
 	}
 
 	public override void AgentOnDone()

@@ -94,7 +94,6 @@ public class RoguelikeAgent : Agent
 			if(canAttack)
 			{
 				Attack();
-				reward += .1f;
 			}
 			else
 			{

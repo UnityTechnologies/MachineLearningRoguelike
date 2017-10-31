@@ -167,7 +167,7 @@ Animator:
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 02a92539d681e422ea46bdecae1ec8bc, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 1
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1848242295057110}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a12b03268ed2c45f788f51a149f2d74e, type: 3}
   m_Name: 
@@ -189,9 +189,9 @@ MonoBehaviour:
   DisplayBrainName: 0
   DisplayBrainType: 0
   DisplayFrameCount: 0
-  DisplayCurrentReward: 0
-  DisplayMaxReward: 0
-  DisplayState: 0
+  DisplayCurrentReward: 1
+  DisplayMaxReward: 1
+  DisplayState: 1
   DisplayAction: 1
 --- !u!114 &114553395094490262
 MonoBehaviour:

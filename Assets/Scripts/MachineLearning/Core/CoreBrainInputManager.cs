@@ -10,7 +10,6 @@ using UnityEditor;
 /// CoreBrain which decides actions using Player input.
 public class CoreBrainInputManager : ScriptableObject, CoreBrain
 {
-
     [System.Serializable]
     private struct ContinuousPlayerAction
     {
@@ -21,6 +20,7 @@ public class CoreBrainInputManager : ScriptableObject, CoreBrain
     [SerializeField]
     /// Contains the mapping from input to continuous actions
     private ContinuousPlayerAction[] continuousPlayerActions;
+    [SerializeField]
 
     /// Reference to the brain that uses this CoreBrainPlayer
     public Brain brain;

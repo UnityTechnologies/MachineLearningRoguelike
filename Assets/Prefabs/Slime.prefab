@@ -179,7 +179,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1848242295057110}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a12b03268ed2c45f788f51a149f2d74e, type: 3}
   m_Name: 
@@ -231,7 +231,8 @@ MonoBehaviour:
   startingHealth: 20
   startingMana: 0
   attackCooldown: 1
-  attackDamage: 5
+  attackDamage: 2
+  health: 0
   enemyAgent: {fileID: 0}
 --- !u!212 &212237051663139144
 SpriteRenderer:

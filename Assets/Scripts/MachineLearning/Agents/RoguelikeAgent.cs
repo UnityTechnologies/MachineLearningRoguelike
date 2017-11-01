@@ -16,7 +16,7 @@ public class RoguelikeAgent : Agent
 	protected Animator animator;
 	protected Vector2 movementInput; //cached input coming from the Brain
 	protected SpriteRenderer graphicsSpriteRenderer;
-	protected int health;
+	public int health;
 	protected int mana;
 
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
@@ -32,6 +32,8 @@ public class RoguelikeAgent : Agent
 	private float enemyDistance, closestEnemyDistance;
 
 	public RoguelikeAgent enemyAgent;
+
+	private Coroutine healCoroutine;
 
     protected virtual void Awake()
 	{
@@ -139,7 +141,7 @@ public class RoguelikeAgent : Agent
 			//stop healing, if it was
 			if(isHealing)
 			{
-				StopCoroutine(Heal());
+				StopCoroutine(healCoroutine);
 				isHealing = false;
 			}
 		}
@@ -149,7 +151,7 @@ public class RoguelikeAgent : Agent
 			if(!isHealing
 				&& health < startingHealth)
 			{
-				StartCoroutine(Heal());
+				healCoroutine = StartCoroutine(Heal());
 			}
 		}
 
@@ -162,14 +164,16 @@ public class RoguelikeAgent : Agent
 	private IEnumerator Heal()
 	{
 		isHealing = true;
+		yield return new WaitForSeconds(2f);
 		
-		while(health < startingHealth)
-		{
-			yield return new WaitForSeconds(2f);
-			
+		while(isHealing
+			&& health < startingHealth)
+		{	
 			//heal and get a reward for it
 			health++;
 			reward += .05f;
+
+			yield return new WaitForSeconds(2f);
 		}
 
 		closestEnemyDistance = Mathf.Infinity; //this will allow again a reward for getting closer

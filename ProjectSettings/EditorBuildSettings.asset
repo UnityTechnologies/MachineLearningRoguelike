@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: a165008ca421046a3bd71c154b1d5602
-  - enabled: 1
+  - enabled: 0
     path: Assets/Alessia Test/Test.unity
     guid: 935debc42e7f54c68bd64bc5ba0699aa

@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1848242295057110}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -17.62, y: 1.22, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4511211026000554}
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
   observations: []
-  maxStep: 1000
+  maxStep: 5000
   resetOnDone: 1
   reward: 0
   done: 0
@@ -229,10 +229,10 @@ MonoBehaviour:
   id: 0
   speed: 100
   startingHealth: 20
-  startingMana: 0
   attackCooldown: 1
   attackDamage: 2
   health: 0
+  movementTowardsEnemy: 0
   enemyAgent: {fileID: 0}
 --- !u!212 &212237051663139144
 SpriteRenderer:

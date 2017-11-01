@@ -6,9 +6,9 @@ public class KnightAgent : RoguelikeAgent
 {
 	private int walkingHash;
 
-	protected override void Awake()
+	public override void InitializeAgent()
 	{
-		base.Awake();
+		base.InitializeAgent();
 
 		walkingHash = Animator.StringToHash("Walking");
 	}

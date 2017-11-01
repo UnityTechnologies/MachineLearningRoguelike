@@ -90,34 +90,26 @@ public class RoguelikeAgent : Agent
 		movementInput.y = Mathf.Clamp(act[1], -1f, 1f);
 
 		rb.AddForce(movementInput * speed, ForceMode2D.Force);
-		
 
 		//DISTANCE CHECK
 		if(enemyAgent != null)
 		{
+			float movementTowardsEnemy = Vector2.Dot(movementInput.normalized, (enemyAgent.transform.position-transform.position).normalized); //-1f if moving away, 1f if moving closer
 			float newEnemyDistance = Vector3.SqrMagnitude(enemyAgent.transform.position - this.transform.position);
-			//is the Agent aggressive or is it fleeing?
-			if(health > startingHealth * .5f)
+			//we want to award reduced distance only if it's this agent who is moving!
+			if(movementInput.sqrMagnitude > .01f)
 			{
-				//aggressive behaviour
-				if(newEnemyDistance < enemyDistance) //moving closer
+				//is the Agent aggressive or is it fleeing?
+				if(health > startingHealth * .5f)
 				{
-					if(newEnemyDistance < closestEnemyDistance) //to avoid exploitation (back and forth)
-					{
-						reward += .1f; //reward the hunt
-					}
-					else
-					{
-						reward -= .05f;
-					}
+					//aggressive behaviour
+					reward += movementTowardsEnemy * .1f; //reward the hunt
+					
 				}
-			}
-			else
-			{
-				//(is its health below half of the original?)
-				if(newEnemyDistance > enemyDistance) //getting further
+				else
 				{
-					reward += .1f; //reward the escape
+					//(is its health below half of the original?)
+					reward -= movementTowardsEnemy * .05f; //reward escaping
 				}
 			}
 			enemyDistance = newEnemyDistance; //cached for CollectState
@@ -142,6 +134,7 @@ public class RoguelikeAgent : Agent
 			if(isHealing)
 			{
 				StopCoroutine(healCoroutine);
+				reward -= .5f;
 				isHealing = false;
 			}
 		}

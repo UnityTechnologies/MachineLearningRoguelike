@@ -231,7 +231,8 @@ MonoBehaviour:
   startingHealth: 20
   startingMana: 0
   attackCooldown: 1
-  attackDamage: 5
+  attackDamage: 2
+  health: 0
   enemyAgent: {fileID: 0}
 --- !u!212 &212237051663139144
 SpriteRenderer:

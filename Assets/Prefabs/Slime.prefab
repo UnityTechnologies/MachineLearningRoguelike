@@ -57,7 +57,6 @@ GameObject:
   - component: {fileID: 95330905472181746}
   - component: {fileID: 50291902327349374}
   - component: {fileID: 114705320353287262}
-  - component: {fileID: 114301718231425728}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Agent
@@ -173,26 +172,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114301718231425728
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1848242295057110}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a12b03268ed2c45f788f51a149f2d74e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fixedPosition: 0
-  verticalOffset: 1
-  DisplayBrainName: 0
-  DisplayBrainType: 0
-  DisplayFrameCount: 0
-  DisplayCurrentReward: 1
-  DisplayMaxReward: 0
-  DisplayState: 0
-  DisplayAction: 0
 --- !u!114 &114553395094490262
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -222,7 +201,7 @@ MonoBehaviour:
   reward: 0
   done: 0
   value: 0
-  CummulativeReward: 0
+  CumulativeReward: 0
   stepCounter: 0
   agentStoredAction: []
   memory: []
@@ -234,7 +213,10 @@ MonoBehaviour:
   health: 0
   rbLocalPosition: {x: 0, y: 0}
   desiredPosition: {x: 0, y: 0, z: 0}
-  enemyAgent: {fileID: 0}
+  targetAgent: {fileID: 0}
+  movementTowardsTarget: 0
+  distanceFromTargetSqr: 0
+  prevDistanceFromTargetSqr: 0
 --- !u!212 &212237051663139144
 SpriteRenderer:
   m_ObjectHideFlags: 1

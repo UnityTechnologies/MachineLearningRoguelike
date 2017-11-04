@@ -23,6 +23,8 @@ public class RoguelikeAgent : Agent
 	public Vector3 desiredPosition;
 	public RoguelikeAgent targetAgent;
 	public float movementTowardsTarget;
+	public float distanceFromTargetSqr;
+	public float prevDistanceFromTargetSqr;
 
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float lastHitTime; //used to verify cooldowns
@@ -36,8 +38,6 @@ public class RoguelikeAgent : Agent
 	private Coroutine healCoroutine;
 	
 	//private Rigidbody2D targetAgentRb;
-	private float distanceFromTargetSqr;
-	private float prevDistanceFromTargetSqr;
 
     public override void InitializeAgent()
 	{
@@ -72,7 +72,7 @@ public class RoguelikeAgent : Agent
 			state.Add(targetAgent.rbLocalPosition.x * .1f);
 			state.Add(targetAgent.rbLocalPosition.y * .1f);
 			state.Add(movementTowardsTarget);
-			state.Add(distanceFromTargetSqr);
+			state.Add(distanceFromTargetSqr * .001f);
 		}
 		else
 		{

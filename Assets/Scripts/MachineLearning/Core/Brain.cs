@@ -15,7 +15,7 @@ public enum BrainType
     Player,
     Heuristic,
     External,
-    Internal
+    Internal,
 }
 
 #else

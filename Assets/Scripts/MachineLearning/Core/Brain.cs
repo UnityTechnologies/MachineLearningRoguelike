@@ -15,16 +15,15 @@ public enum BrainType
     Player,
     Heuristic,
     External,
-    InputManager,
-    Internal,
+    Internal
 }
+
 #else
 public enum BrainType
 {
-Player,
-Heuristic,
-External,
-InputManager,
+    Player,
+    Heuristic,
+    External,
 }
 #endif
 
@@ -34,8 +33,7 @@ InputManager,
 public enum StateType
 {
     discrete,
-    continuous
-}
+    continuous}
 ;
 
 /** Only need to be modified in the brain's inpector.
@@ -125,6 +123,18 @@ public class Brain : MonoBehaviour
             }
 
         }
+        else
+        {
+            foreach (BrainType bt in System.Enum.GetValues(typeof(BrainType)))
+            {
+                if ((int)bt >= CoreBrains.Length)
+                    break;
+                if (CoreBrains[(int)bt] == null)
+                {
+                    CoreBrains[(int)bt] = ScriptableObject.CreateInstance("CoreBrain" + bt.ToString());
+                }
+            }
+        }
 
         // If the length of CoreBrains does not match the number of BrainTypes, 
         // we increase the length of CoreBrains
@@ -152,7 +162,14 @@ public class Brain : MonoBehaviour
         {
             foreach (BrainType bt in System.Enum.GetValues(typeof(BrainType)))
             {
-                CoreBrains[(int)bt] = ScriptableObject.Instantiate(CoreBrains[(int)bt]);
+                if (CoreBrains[(int)bt] == null)
+                {
+                    CoreBrains[(int)bt] = ScriptableObject.CreateInstance("CoreBrain" + bt.ToString());
+                }
+                else
+                {
+                    CoreBrains[(int)bt] = ScriptableObject.Instantiate(CoreBrains[(int)bt]);
+                }
             }
             instanceID = gameObject.GetInstanceID();
         }
@@ -178,13 +195,14 @@ public class Brain : MonoBehaviour
         Dictionary<int, List<float>> result = new Dictionary<int, List<float>>();
         foreach (KeyValuePair<int, Agent> idAgent in agents)
         {
+            idAgent.Value.SetCumulativeReward();
             List<float> states = idAgent.Value.CollectState();
-            if ((states.Count != brainParameters.stateSize) && (brainParameters.stateSpaceType == StateType.continuous ))
+            if ((states.Count != brainParameters.stateSize) && (brainParameters.stateSpaceType == StateType.continuous))
             {
                 throw new UnityAgentsException(string.Format(@"The number of states does not match for agent {0}:
     Was expecting {1} continuous states but received {2}.", idAgent.Value.gameObject.name, brainParameters.stateSize, states.Count));
             }
-            if ((states.Count != 1) && (brainParameters.stateSpaceType == StateType.discrete ))
+            if ((states.Count != 1) && (brainParameters.stateSpaceType == StateType.discrete))
             {
                 throw new UnityAgentsException(string.Format(@"The number of states does not match for agent {0}:
     Was expecting 1 discrete states but received {1}.", idAgent.Value.gameObject.name, states.Count));

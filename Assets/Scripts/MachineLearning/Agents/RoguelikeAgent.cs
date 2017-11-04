@@ -15,28 +15,29 @@ public class RoguelikeAgent : Agent
 	protected Animator animator;
 	protected Vector2 movementInput; //cached input coming from the Brain
 	protected SpriteRenderer graphicsSpriteRenderer;
-	public int health;
 
+	[Header("Debug stuff")]
 	//[HideInInspector]
-	public Vector2 desiredLocalPosition;
+	public int health;
+	public Vector2 rbLocalPosition;
 	public Vector3 desiredPosition;
+	public RoguelikeAgent targetAgent;
+	public float movementTowardsTarget;
 
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float lastHitTime; //used to verify cooldowns
 	private int doAttackHash;
-	private Collider2D damageCollider;
+	//private Collider2D damageCollider;
 	private Color originalColour;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startLocalPosition;
-	private Rigidbody2D enemyAgentRb;
 	private bool isHealing;
-	private float movementTowardsEnemy;
-	//private float prevDistanceFromTarget;
-
-	public RoguelikeAgent enemyAgent;
-
 	private Coroutine healCoroutine;
+	
+	//private Rigidbody2D targetAgentRb;
+	private float distanceFromTargetSqr;
+	private float prevDistanceFromTargetSqr;
 
     public override void InitializeAgent()
 	{
@@ -45,11 +46,11 @@ public class RoguelikeAgent : Agent
 		graphicsSpriteRenderer = transform.Find("Graphics").GetComponent<SpriteRenderer>();
 		doAttackHash = Animator.StringToHash("DoAttack");
 		startLocalPosition = transform.localPosition;
-		//prevDistanceFromTarget = Mathf.Infinity;
 		originalColour = graphicsSpriteRenderer.color;
-		if(enemyAgent != null)
+		if(targetAgent != null)
 		{
-			enemyAgentRb = enemyAgent.GetComponent<Rigidbody2D>();
+			prevDistanceFromTargetSqr = Mathf.Infinity;
+			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
 		}
 		AgentReset(); //will reset some key variables
 	}
@@ -58,23 +59,25 @@ public class RoguelikeAgent : Agent
 	{
 		List<float> state = new List<float>();
 		//Agent data
-		state.Add(desiredLocalPosition.x);
-		state.Add(desiredLocalPosition.y);
-		state.Add(health);
+		state.Add(rbLocalPosition.x * .1f);
+		state.Add(rbLocalPosition.y * .1f);
+		state.Add(health * .1f);
 		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
 		state.Add((isHealing) ? 1f : 0f);
 
 		//Enemy data
-		if(enemyAgent != null)
+		if(targetAgent != null)
 		{
 			state.Add(1f); //does this Agent have an enemy?
-			state.Add(enemyAgent.desiredLocalPosition.x);
-			state.Add(enemyAgent.desiredLocalPosition.y);
-			state.Add(movementTowardsEnemy);
+			state.Add(targetAgent.rbLocalPosition.x * .1f);
+			state.Add(targetAgent.rbLocalPosition.y * .1f);
+			state.Add(movementTowardsTarget);
+			state.Add(distanceFromTargetSqr);
 		}
 		else
 		{
 			//enemy data is set to zero
+			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
@@ -93,21 +96,25 @@ public class RoguelikeAgent : Agent
 		{
 			if(act[0] == 0f)
 			{
-				movementInput.x = -1f;
+				//do nothing
 			}
 			if(act[0] == 1f)
 			{
-				movementInput.x = 1f;
+				movementInput.x = -1f;
 			}
 			if(act[0] == 2f)
 			{
-				movementInput.y = 1f;
+				movementInput.x = 1f;
 			}
 			if(act[0] == 3f)
 			{
-				movementInput.y = -1f;
+				movementInput.y = 1f;
 			}
 			if(act[0] == 4f)
+			{
+				movementInput.y = -1f;
+			}
+			if(act[0] == 5f)
 			{
 				attack = true;
 			}
@@ -121,26 +128,32 @@ public class RoguelikeAgent : Agent
 
 		//MOVEMENT
 		Vector2 movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * 2f;
-		desiredPosition = desiredPosition + (Vector3)movementFactor;
-		desiredLocalPosition = desiredLocalPosition + movementFactor;
-		rb.MovePosition(desiredPosition);
+		rb.position += (Vector2)movementFactor;
+		rbLocalPosition = (Vector2)(rb.position - (Vector2)transform.parent.position) + movementFactor;
+
+		bool isInDanger = health < startingHealth * .5f;
 
 		//DISTANCE CHECK
-		//float currentDistanceFromTarget = (enemyAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
-		if (enemyAgent != null)
+		if (targetAgent != null)
 		{
-			movementTowardsEnemy = Vector2.Dot(movementInput.normalized, (enemyAgent.desiredLocalPosition-desiredLocalPosition).normalized); //-1f if moving away, 1f if moving closer
+			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
+			movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rbLocalPosition-rbLocalPosition).normalized); //-1f if moving away, 1f if moving closer
 			
-			if (health >= startingHealth * .5f)
+			if (!isInDanger)
 			{
-				reward += .01f * movementTowardsEnemy;
+				//pursue
+				if(distanceFromTargetSqr < prevDistanceFromTargetSqr)
+				{
+					reward += .1f / (distanceFromTargetSqr + .01f);// * movementTowardsTarget;
+				}
 			}
 			else
 			{
-				reward -= .01f * movementTowardsEnemy;
+				//retreat
+				//reward -= .05f * (movementTowardsTarget + .5f);
 			}
+			prevDistanceFromTargetSqr = distanceFromTargetSqr;
 		}
-		//prevDistanceFromTarget = currentDistanceFromTarget;
 		
 		//ATTACK
 		if(attack)
@@ -151,7 +164,7 @@ public class RoguelikeAgent : Agent
 			}
 			else
 			{
-				reward -= .01f; //penalty for trying to attack when it can't
+				reward -= .1f; //penalty for trying to attack when it can't
 			}
 
 			/* //stop healing, if it was
@@ -168,14 +181,9 @@ public class RoguelikeAgent : Agent
 			if(!isHealing
 				&& health < startingHealth)
 			{
-				healCoroutine = StartCoroutine(Heal());
+				//healCoroutine = StartCoroutine(Heal());
 			}
 		}
-
-
-		//FINAL OPERATIONS
-		//rb.velocity *= .5f; //fake drag
-		//reward -= .05f; //base negative reward, to push the agent to act
 	}
 
 	private IEnumerator Heal()
@@ -186,10 +194,8 @@ public class RoguelikeAgent : Agent
 		while(isHealing
 			&& health < startingHealth)
 		{	
-			//heal and get a reward for it
+			//heal
 			health++;
-			reward += .05f;
-
 			yield return new WaitForSeconds(2f);
 		}
 
@@ -200,7 +206,6 @@ public class RoguelikeAgent : Agent
     {
 		canAttack = false;
         animator.SetTrigger(doAttackHash);
-		//rb.AddForce(movementInput * speed * .5f, ForceMode2D.Impulse); //add a strong push
 
 		yield return new WaitForSeconds(attackCooldown);
 
@@ -216,12 +221,12 @@ public class RoguelikeAgent : Agent
 			isTargetDead = target.ReceiveDamage(attackDamage);
 			if(isTargetDead)
 			{
-				reward += 2f;
+				reward += 1f;
 				done = true;
 			}
 			else
 			{
-				reward += 1f;
+				reward += .4f;
 			}
 		}
 
@@ -233,28 +238,26 @@ public class RoguelikeAgent : Agent
         health -= attackDamage;
 		if(health <= 0)
 		{
+			reward -= 1f;
 			Die();
-			reward -= 2f;
 			return true;
 		}
 		else
 		{
 			StartCoroutine(HitFlicker());
-			reward -= .5f;
+			reward -= .4f;
 			return false;
 		}
     }
 
 	private void Die()
 	{
-		if(brain.brainType == BrainType.External)
+		//During training
+		done = true;
+
+		if(brain.brainType == BrainType.Internal)
 		{
-			//During training
-			done = true;
-		}
-		else
-		{
-			//During gameplay
+			//During actual gameplay
 			Destroy(gameObject);
 		}
 
@@ -279,19 +282,22 @@ public class RoguelikeAgent : Agent
 
 	public override void AgentReset()
 	{
-		rb.velocity = Vector3.zero;
+		//rb.velocity = Vector3.zero;
 		health = startingHealth;
-		if(brain.brainType == BrainType.InputManager)
+		if(brain.brainType == BrainType.External)
 		{
-			transform.localPosition = new Vector3(UnityEngine.Random.Range(-2f, 2f), UnityEngine.Random.Range(-2f, 2f), 0f);
+			//fixed position, only for the trainee
+			transform.localPosition = startLocalPosition;
 		}
 		else
 		{
-			transform.localPosition = startLocalPosition;
+			//randomised position for players, heuristic (the opponents during training) and during inference
+			float offset = FindObjectOfType<RoguelikeAcademy>().startDistance;
+			transform.localPosition = UnityEngine.Random.insideUnitCircle.normalized * offset;
 		}
-		desiredLocalPosition = transform.localPosition;
+		rbLocalPosition = transform.localPosition;
 		desiredPosition = transform.position;
-		//prevDistanceFromTarget = Mathf.Infinity;
+		prevDistanceFromTargetSqr = Mathf.Infinity;
 	}
 
 	public override void AgentOnDone()

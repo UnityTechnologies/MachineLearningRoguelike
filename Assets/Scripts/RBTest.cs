@@ -17,7 +17,8 @@ public class RBTest : MonoBehaviour {
 		Debug.Log("FU Position: " + transform.position.x);
 		Debug.Log("FU RB Position: " + rb.position.x);
 
-		rb.MovePosition(transform.position + transform.right);
+		//rb.MovePosition(rb.position + (Vector2)transform.right);
+		rb.position = (rb.position + (Vector2)transform.right);
 
 		Debug.Log("FU New Position: " + transform.position.x);
 		Debug.Log("FU New RB Position: " + rb.position.x);

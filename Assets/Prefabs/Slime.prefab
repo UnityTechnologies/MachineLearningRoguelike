@@ -140,7 +140,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.3
+  m_Radius: 0.5
 --- !u!70 &70330620284704170
 CapsuleCollider2D:
   m_ObjectHideFlags: 1
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
   observations: []
-  maxStep: 1000
+  maxStep: 5000
   resetOnDone: 1
   reward: 0
   done: 0
@@ -229,10 +229,11 @@ MonoBehaviour:
   id: 0
   speed: 100
   startingHealth: 20
-  startingMana: 0
   attackCooldown: 1
   attackDamage: 2
   health: 0
+  rbLocalPosition: {x: 0, y: 0}
+  desiredPosition: {x: 0, y: 0, z: 0}
   enemyAgent: {fileID: 0}
 --- !u!212 &212237051663139144
 SpriteRenderer:
@@ -269,7 +270,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 389f5a54a84524403ae39f3fba6fb18d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6965518, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

@@ -7,6 +7,7 @@ public class MLHelper : EditorWindow
 {
 	private GameObject brainObject;
 	private Brain mlBrain;
+	private bool tryToFindBrain = true;
 
 	[MenuItem("Machine Learning/Open Helper")]
 	public static void ShowEditorWindow()
@@ -22,11 +23,30 @@ public class MLHelper : EditorWindow
 		style.padding = new RectOffset(10, 10, 20, 10);
 		EditorGUILayout.BeginVertical(style);
 
-		EditorGUILayout.LabelField("Brain Used");
-		brainObject = EditorGUILayout.ObjectField(brainObject, typeof(GameObject)) as GameObject;
+		EditorGUILayout.LabelField("Brain to use");
+		brainObject = (GameObject)EditorGUILayout.ObjectField(brainObject, typeof(GameObject), true);
 		if(brainObject != null)
 		{
 			mlBrain = brainObject.GetComponent<Brain>();
+		}
+		else
+		{
+			bool findButton = GUILayout.Button("Find brain", GUILayout.Height(20f));
+			if(tryToFindBrain || findButton)
+			{
+				Brain[] allBrains = GameObject.FindObjectsOfType<Brain>();
+				foreach(Brain br in allBrains)
+				{
+					if(br.brainType == BrainType.External || br.brainType == BrainType.Internal)
+					{
+						//found
+						brainObject = br.gameObject;
+						break;
+					}
+				}
+
+				tryToFindBrain = false;
+			}
 		}
 
 		GUILayout.Space(20f);

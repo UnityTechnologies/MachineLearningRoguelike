@@ -32,7 +32,6 @@ public class RoguelikeAgent : Agent
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startLocalPosition;
-	private Vector3 desiredPosition;
     private Vector2 rbLocalPosition;
 	private bool isHealing;
 	private Coroutine healCoroutine;
@@ -220,8 +219,6 @@ public class RoguelikeAgent : Agent
 		canAttack = false;
         animator.SetTrigger(doAttackHash);
 
-		reward -= .1f;
-
 		yield return new WaitForSeconds(attackCooldown);
 
 		canAttack = true;
@@ -251,6 +248,8 @@ public class RoguelikeAgent : Agent
     public bool ReceiveDamage(int attackDamage)
     {
         Health -= attackDamage;
+		UIManager.Instance.ShowDamageText(attackDamage, this.transform.position);
+
 		if(Health <= 0)
 		{
 			reward -= 1f;
@@ -260,7 +259,7 @@ public class RoguelikeAgent : Agent
 		else
 		{
 			StartCoroutine(HitFlicker());
-			reward -= .5f;
+			reward -= .3f;
 			return false;
 		}
     }
@@ -297,7 +296,6 @@ public class RoguelikeAgent : Agent
 
 	public override void AgentReset()
 	{
-		//rb.velocity = Vector3.zero;
 		Health = startingHealth;
 		if(brain.brainType == BrainType.External)
 		{
@@ -311,7 +309,6 @@ public class RoguelikeAgent : Agent
 			transform.localPosition = UnityEngine.Random.insideUnitCircle.normalized * offset;
 		}
 		rbLocalPosition = transform.localPosition;
-		desiredPosition = transform.position;
 		prevDistanceFromTargetSqr = Mathf.Infinity;
 	}
 

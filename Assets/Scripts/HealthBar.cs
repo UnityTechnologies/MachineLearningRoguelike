@@ -6,6 +6,7 @@ public class HealthBar : MonoBehaviour {
 	private SpriteRenderer backgroundBar, healthBar;
 	private Transform healthBarTransform;
 	private ColourPalette palette;
+	private bool setup = false;
 	
 	private void Awake()
 	{
@@ -16,11 +17,16 @@ public class HealthBar : MonoBehaviour {
 
 		palette = Resources.Load<ColourPalette>("Palette");
 
-		SetHealth(1,1);
+		setup = true;
 	}
 
 	public void SetHealth(float health, float totalHealth)
 	{
+		if(!setup)
+		{
+			Awake();
+		}
+
 		//enable/disable the health bar
 		if(health == totalHealth)
 		{

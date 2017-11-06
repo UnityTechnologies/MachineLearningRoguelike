@@ -55,3 +55,6 @@ TagManager:
   - name: High
     uniqueID: 1422248273
     locked: 0
+  - name: UI
+    uniqueID: 2720897385
+    locked: 0

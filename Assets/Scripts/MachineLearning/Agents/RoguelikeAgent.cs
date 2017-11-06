@@ -10,40 +10,44 @@ public class RoguelikeAgent : Agent
 	public int startingHealth = 100;
 	public float attackCooldown = 1f;
 	public int attackDamage = 5;
+    
+	public int Health {
+		get { return health; }
+		set { health = value; healthBar.SetHealth(health, startingHealth); }
+	}
 
 	protected Rigidbody2D rb;
 	protected Animator animator;
 	protected Vector2 movementInput; //cached input coming from the Brain
 	protected SpriteRenderer graphicsSpriteRenderer;
 
-	[Header("Debug stuff")]
-	//[HideInInspector]
-	public int health;
-	public Vector2 rbLocalPosition;
-	public Vector3 desiredPosition;
+    [Header("Debug stuff")]
 	public RoguelikeAgent targetAgent;
-	public float movementTowardsTarget;
-	public float distanceFromTargetSqr;
-	public float prevDistanceFromTargetSqr;
 
+    private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float lastHitTime; //used to verify cooldowns
 	private int doAttackHash;
-	//private Collider2D damageCollider;
 	private Color originalColour;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startLocalPosition;
+	private Vector3 desiredPosition;
+    private Vector2 rbLocalPosition;
 	private bool isHealing;
 	private Coroutine healCoroutine;
-	
-	//private Rigidbody2D targetAgentRb;
+	private float movementTowardsTarget;
+	private float distanceFromTargetSqr;
+	private float prevDistanceFromTargetSqr;
+	private HealthBar healthBar;
+
 
     public override void InitializeAgent()
 	{
 		rb = GetComponent<Rigidbody2D>();
 		animator = GetComponent<Animator>();
 		graphicsSpriteRenderer = transform.Find("Graphics").GetComponent<SpriteRenderer>();
+		healthBar = transform.GetComponentInChildren<HealthBar>();
 		doAttackHash = Animator.StringToHash("DoAttack");
 		startLocalPosition = transform.localPosition;
 		originalColour = graphicsSpriteRenderer.color;
@@ -61,7 +65,7 @@ public class RoguelikeAgent : Agent
 		//Agent data
 		state.Add(rbLocalPosition.x * .1f);
 		state.Add(rbLocalPosition.y * .1f);
-		state.Add(health * .1f);
+		state.Add(Health * .1f);
 		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
 		state.Add((isHealing) ? 1f : 0f);
 
@@ -131,7 +135,7 @@ public class RoguelikeAgent : Agent
 		rb.position += (Vector2)movementFactor;
 		rbLocalPosition = (Vector2)(rb.position - (Vector2)transform.parent.position) + movementFactor;
 
-		bool isInDanger = health < startingHealth * .5f;
+		bool isInDanger = Health < startingHealth * .7f;
 
 		//DISTANCE CHECK
 		if (targetAgent != null)
@@ -144,15 +148,19 @@ public class RoguelikeAgent : Agent
 				//pursue
 				if(distanceFromTargetSqr < prevDistanceFromTargetSqr)
 				{
-					reward += .1f / (distanceFromTargetSqr + .01f);// * movementTowardsTarget;
+					reward += .2f;
+					prevDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
 			else
 			{
 				//retreat
-				//reward -= .05f * (movementTowardsTarget + .5f);
+				if(distanceFromTargetSqr > prevDistanceFromTargetSqr)
+				{
+					reward += .2f;
+					prevDistanceFromTargetSqr = distanceFromTargetSqr;
+				}
 			}
-			prevDistanceFromTargetSqr = distanceFromTargetSqr;
 		}
 		
 		//ATTACK
@@ -179,9 +187,12 @@ public class RoguelikeAgent : Agent
 		{
 			//if not attacking, can start healing
 			if(!isHealing
-				&& health < startingHealth)
+				&& Health < startingHealth)
 			{
-				//healCoroutine = StartCoroutine(Heal());
+				if(brain.brainType != BrainType.External)
+				{
+					healCoroutine = StartCoroutine(Heal());
+				}
 			}
 		}
 	}
@@ -189,16 +200,18 @@ public class RoguelikeAgent : Agent
 	private IEnumerator Heal()
 	{
 		isHealing = true;
+		prevDistanceFromTargetSqr = 0f;
 		yield return new WaitForSeconds(2f);
 		
 		while(isHealing
-			&& health < startingHealth)
+			&& Health < startingHealth)
 		{	
 			//heal
-			health++;
+			Health++;
 			yield return new WaitForSeconds(2f);
 		}
 
+		prevDistanceFromTargetSqr = Mathf.Infinity;
 		isHealing = false;
 	}
 
@@ -206,6 +219,8 @@ public class RoguelikeAgent : Agent
     {
 		canAttack = false;
         animator.SetTrigger(doAttackHash);
+
+		reward -= .1f;
 
 		yield return new WaitForSeconds(attackCooldown);
 
@@ -226,7 +241,7 @@ public class RoguelikeAgent : Agent
 			}
 			else
 			{
-				reward += .4f;
+				reward += .5f;
 			}
 		}
 
@@ -235,8 +250,8 @@ public class RoguelikeAgent : Agent
 	//Returns if the Agent is dead or not, to reward the attacker
     public bool ReceiveDamage(int attackDamage)
     {
-        health -= attackDamage;
-		if(health <= 0)
+        Health -= attackDamage;
+		if(Health <= 0)
 		{
 			reward -= 1f;
 			Die();
@@ -245,7 +260,7 @@ public class RoguelikeAgent : Agent
 		else
 		{
 			StartCoroutine(HitFlicker());
-			reward -= .4f;
+			reward -= .5f;
 			return false;
 		}
     }
@@ -283,7 +298,7 @@ public class RoguelikeAgent : Agent
 	public override void AgentReset()
 	{
 		//rb.velocity = Vector3.zero;
-		health = startingHealth;
+		Health = startingHealth;
 		if(brain.brainType == BrainType.External)
 		{
 			//fixed position, only for the trainee

@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1a2387a5cce64c7fa1a749d5dece54b, type: 3}
+  m_Name: Palette
+  m_EditorClassIdentifier: 
+  healthGreen: {r: 0.36551726, g: 1, b: 0, a: 1}
+  healthOrange: {r: 1, g: 0.59999996, b: 0, a: 1}
+  healthRed: {r: 1, g: 0, b: 0, a: 1}

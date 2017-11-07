@@ -16,7 +16,8 @@ public class RoguelikeAgent : Agent
 		set { health = value; healthBar.SetHealth(health, startingHealth); }
 	}
 
-	protected Rigidbody2D rb;
+
+    protected Rigidbody2D rb;
 	protected Animator animator;
 	protected Vector2 movementInput; //cached input coming from the Brain
 	protected SpriteRenderer graphicsSpriteRenderer;
@@ -27,18 +28,20 @@ public class RoguelikeAgent : Agent
     private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float lastHitTime; //used to verify cooldowns
-	private int doAttackHash;
+	private int doAttackHash, isWalkingHash;
 	private Color originalColour;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startLocalPosition;
     private Vector2 rbLocalPosition;
+    private Vector2 movementFactor;
 	private bool isHealing;
 	private Coroutine healCoroutine;
 	private float movementTowardsTarget;
 	private float distanceFromTargetSqr;
 	private float prevDistanceFromTargetSqr;
 	private HealthBar healthBar;
+	private Transform parentTransform;
 
 
     public override void InitializeAgent()
@@ -48,6 +51,7 @@ public class RoguelikeAgent : Agent
 		graphicsSpriteRenderer = transform.Find("Graphics").GetComponent<SpriteRenderer>();
 		healthBar = transform.GetComponentInChildren<HealthBar>();
 		doAttackHash = Animator.StringToHash("DoAttack");
+		isWalkingHash = Animator.StringToHash("IsWalking");
 		startLocalPosition = transform.localPosition;
 		originalColour = graphicsSpriteRenderer.color;
 		if(targetAgent != null)
@@ -55,6 +59,7 @@ public class RoguelikeAgent : Agent
 			prevDistanceFromTargetSqr = Mathf.Infinity;
 			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
 		}
+		parentTransform = transform.parent;
 		AgentReset(); //will reset some key variables
 	}
 
@@ -130,9 +135,10 @@ public class RoguelikeAgent : Agent
 		}
 
 		//MOVEMENT
-		Vector2 movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * 2f;
+		movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * 2f;
 		rb.position += (Vector2)movementFactor;
-		rbLocalPosition = (Vector2)(rb.position - (Vector2)transform.parent.position) + movementFactor;
+		Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
+		rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;
 
 		bool isInDanger = Health < startingHealth * .7f;
 
@@ -250,16 +256,15 @@ public class RoguelikeAgent : Agent
         Health -= attackDamage;
 		UIManager.Instance.ShowDamageText(attackDamage, this.transform.position);
 
+		reward -= 1f;
 		if(Health <= 0)
 		{
-			reward -= 1f;
 			Die();
 			return true;
 		}
 		else
 		{
 			StartCoroutine(HitFlicker());
-			reward -= .3f;
 			return false;
 		}
     }
@@ -315,5 +320,10 @@ public class RoguelikeAgent : Agent
 	public override void AgentOnDone()
 	{
 		
+	}
+
+	private void Update()
+	{
+		animator.SetBool(isWalkingHash, movementFactor != Vector2.zero);
 	}
 }

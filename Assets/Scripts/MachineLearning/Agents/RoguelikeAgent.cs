@@ -10,6 +10,7 @@ public class RoguelikeAgent : Agent
 	public int startingHealth = 100;
 	public float attackCooldown = 1f;
 	public int attackDamage = 5;
+	public float searchRadius = 6f;
     
 	public int Health {
 		get { return health; }
@@ -27,6 +28,8 @@ public class RoguelikeAgent : Agent
 
     private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
+	private float searchTargetInterval = 4f;
+	private float lastSearchTime = -10f;
 	private float lastHitTime; //used to verify cooldowns
 	private int doAttackHash, isWalkingHash;
 	private Color originalColour;
@@ -39,9 +42,10 @@ public class RoguelikeAgent : Agent
 	private Coroutine healCoroutine;
 	private float movementTowardsTarget;
 	private float distanceFromTargetSqr;
-	private float prevDistanceFromTargetSqr;
+	private float thresholdDistanceFromTargetSqr;
 	private HealthBar healthBar;
 	private Transform parentTransform;
+	private RoguelikeAcademy academy;
 
 
     public override void InitializeAgent()
@@ -54,12 +58,9 @@ public class RoguelikeAgent : Agent
 		isWalkingHash = Animator.StringToHash("IsWalking");
 		startLocalPosition = transform.localPosition;
 		originalColour = graphicsSpriteRenderer.color;
-		if(targetAgent != null)
-		{
-			prevDistanceFromTargetSqr = Mathf.Infinity;
-			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
-		}
+		academy = FindObjectOfType<RoguelikeAcademy>();
 		parentTransform = transform.parent;
+		
 		AgentReset(); //will reset some key variables
 	}
 
@@ -140,7 +141,7 @@ public class RoguelikeAgent : Agent
 		Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
 		rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;
 
-		bool isInDanger = Health < startingHealth * .7f;
+		bool isInDanger = Health < startingHealth * .5f;
 
 		//DISTANCE CHECK
 		if (targetAgent != null)
@@ -151,19 +152,19 @@ public class RoguelikeAgent : Agent
 			if (!isInDanger)
 			{
 				//pursue
-				if(distanceFromTargetSqr < prevDistanceFromTargetSqr)
+				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;
-					prevDistanceFromTargetSqr = distanceFromTargetSqr;
+					reward += .1f / (distanceFromTargetSqr + .01f);// * movementTowardsTarget;
+					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
 			else
 			{
 				//retreat
-				if(distanceFromTargetSqr > prevDistanceFromTargetSqr)
+				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
 					reward += .2f;
-					prevDistanceFromTargetSqr = distanceFromTargetSqr;
+					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
 		}
@@ -205,7 +206,7 @@ public class RoguelikeAgent : Agent
 	private IEnumerator Heal()
 	{
 		isHealing = true;
-		prevDistanceFromTargetSqr = 0f;
+		thresholdDistanceFromTargetSqr = 0f;
 		yield return new WaitForSeconds(2f);
 		
 		while(isHealing
@@ -216,7 +217,7 @@ public class RoguelikeAgent : Agent
 			yield return new WaitForSeconds(2f);
 		}
 
-		prevDistanceFromTargetSqr = Mathf.Infinity;
+		thresholdDistanceFromTargetSqr = Mathf.Infinity;
 		isHealing = false;
 	}
 
@@ -240,7 +241,10 @@ public class RoguelikeAgent : Agent
 			if(isTargetDead)
 			{
 				reward += 1f;
-				done = true;
+				if(!academy.isInference)
+				{
+					done = true;
+				}
 			}
 			else
 			{
@@ -302,19 +306,24 @@ public class RoguelikeAgent : Agent
 	public override void AgentReset()
 	{
 		Health = startingHealth;
-		if(brain.brainType == BrainType.External)
+		if(brain.brainType == BrainType.External
+			|| academy.isInference)
 		{
-			//fixed position, only for the trainee
+			//fixed position, only for the trainee - or during gameplay
 			transform.localPosition = startLocalPosition;
 		}
 		else
 		{
 			//randomised position for players, heuristic (the opponents during training) and during inference
-			float offset = FindObjectOfType<RoguelikeAcademy>().startDistance;
+			float offset = academy.startDistance;
 			transform.localPosition = UnityEngine.Random.insideUnitCircle.normalized * offset;
 		}
+		if(targetAgent != null)
+		{
+			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
+		}
 		rbLocalPosition = transform.localPosition;
-		prevDistanceFromTargetSqr = Mathf.Infinity;
+		thresholdDistanceFromTargetSqr = Mathf.Infinity;
 	}
 
 	public override void AgentOnDone()
@@ -325,5 +334,28 @@ public class RoguelikeAgent : Agent
 	private void Update()
 	{
 		animator.SetBool(isWalkingHash, movementFactor != Vector2.zero);
+
+		//search for a potential target
+		float currentTime = Time.time;
+		if(targetAgent == null
+			&& currentTime > lastSearchTime + searchTargetInterval)
+		{
+			targetAgent = SearchForTarget();
+			lastSearchTime = currentTime;
+		}
+		else
+		{
+			if(distanceFromTargetSqr > searchRadius * searchRadius)
+			{
+				//target lost
+				targetAgent = null;
+			}
+		}
+	}
+
+	protected virtual RoguelikeAgent SearchForTarget()
+	{
+		//this is implemented in inheriting classes
+		return null;
 	}
 }

@@ -26,7 +26,7 @@ public class RoguelikeRandomDecision : MonoBehaviour, Decision {
 		{
 			act = new float[1];
 
-			if(Random.Range(0f, 5f) > .01f)
+			if(Random.Range(0f, 1f) > .01f)
 			{
 				//move
 				//act[0] = (float)Random.Range(0, 4); //from 0 to 3

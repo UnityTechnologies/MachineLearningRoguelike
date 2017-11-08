@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 5b5edcb7f9b804d46b82401930ed42d1
-timeCreated: 1509021561
+timeCreated: 1510153378
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -3211,12 +3211,12 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -5, y: 8}
-        - {x: -6, y: 7}
-        - {x: -6, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 7}
-        - {x: 3, y: 8}
+      - - {x: -3, y: 6}
+        - {x: -4, y: 5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 4, y: 5}
+        - {x: 3, y: 6}
       tessellationDetail: 0
     - serializedVersion: 2
       name: DungeonSpritesheet_153
@@ -3399,12 +3399,12 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -5, y: 8}
-        - {x: -6, y: 7}
-        - {x: -6, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 7}
-        - {x: 3, y: 8}
+      - - {x: -3, y: 6}
+        - {x: -4, y: 5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 4, y: 5}
+        - {x: 3, y: 6}
       tessellationDetail: 0
     - serializedVersion: 2
       name: DungeonSpritesheet_162
@@ -3419,12 +3419,12 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -5, y: 8}
-        - {x: -6, y: 7}
-        - {x: -6, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 7}
-        - {x: 3, y: 8}
+      - - {x: -3, y: 6}
+        - {x: -4, y: 5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 4, y: 5}
+        - {x: 3, y: 6}
       tessellationDetail: 0
     - serializedVersion: 2
       name: DungeonSpritesheet_168

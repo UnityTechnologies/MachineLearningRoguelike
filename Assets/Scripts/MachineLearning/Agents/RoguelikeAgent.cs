@@ -147,7 +147,7 @@ public class RoguelikeAgent : Agent
 		}
 
 		//MOVEMENT
-		movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * 2f;
+		movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * speed;
 		rb.position += (Vector2)movementFactor;
 		Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
 		rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;

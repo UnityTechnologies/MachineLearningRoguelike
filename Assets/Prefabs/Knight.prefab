@@ -278,11 +278,12 @@ MonoBehaviour:
   agentStoredAction: []
   memory: []
   id: 0
-  speed: 150
+  speed: 3
   startingHealth: 30
   attackCooldown: 1
   attackDamage: 5
   searchRadius: 6
+  preassignedTarget: {fileID: 0}
   targetAgent: {fileID: 0}
 --- !u!212 &212116379110632084
 SpriteRenderer:

@@ -297,11 +297,12 @@ MonoBehaviour:
   agentStoredAction: []
   memory: []
   id: 0
-  speed: 80
+  speed: 2
   startingHealth: 10
   attackCooldown: 1
   attackDamage: 2
   searchRadius: 6
+  preassignedTarget: {fileID: 0}
   targetAgent: {fileID: 0}
 --- !u!114 &114767777583968530
 MonoBehaviour:

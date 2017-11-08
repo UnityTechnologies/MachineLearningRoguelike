@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 70831973978703644}
   m_Layer: 8
   m_Name: Graphics
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,7 +130,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1860824318153056}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.65, y: 1.73, z: 0}
+  m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4404161336581330}
@@ -282,6 +282,7 @@ MonoBehaviour:
   startingHealth: 30
   attackCooldown: 1
   attackDamage: 5
+  searchRadius: 6
   targetAgent: {fileID: 0}
 --- !u!212 &212116379110632084
 SpriteRenderer:

@@ -16,6 +16,7 @@ public class RoguelikeAgent : Agent
 		get { return health; }
 		set { health = value; healthBar.SetHealth(health, startingHealth); }
 	}
+	public RoguelikeAgent preassignedTarget;
 
 
     protected Rigidbody2D rb;
@@ -24,8 +25,10 @@ public class RoguelikeAgent : Agent
 	protected SpriteRenderer graphicsSpriteRenderer;
 
     [Header("Debug stuff")]
-	public RoguelikeAgent targetAgent;
+	[SerializeField]
+	private RoguelikeAgent targetAgent;
 
+	private bool hasToSearchForTarget;
     private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float searchTargetInterval = 4f;
@@ -60,6 +63,14 @@ public class RoguelikeAgent : Agent
 		originalColour = graphicsSpriteRenderer.color;
 		academy = FindObjectOfType<RoguelikeAcademy>();
 		parentTransform = transform.parent;
+		if(preassignedTarget != null)
+		{
+			targetAgent = preassignedTarget;
+		}
+		else
+		{
+			hasToSearchForTarget = true; //targetAgent will be looked for in the Update
+		}
 		
 		AgentReset(); //will reset some key variables
 	}
@@ -335,20 +346,27 @@ public class RoguelikeAgent : Agent
 	{
 		animator.SetBool(isWalkingHash, movementFactor != Vector2.zero);
 
-		//search for a potential target
-		float currentTime = Time.time;
-		if(targetAgent == null
-			&& currentTime > lastSearchTime + searchTargetInterval)
+		if(hasToSearchForTarget)
 		{
-			targetAgent = SearchForTarget();
-			lastSearchTime = currentTime;
-		}
-		else
-		{
-			if(distanceFromTargetSqr > searchRadius * searchRadius)
+			//search for a potential target
+			float currentTime = Time.time;
+			if(currentTime > lastSearchTime + searchTargetInterval)
 			{
-				//target lost
-				targetAgent = null;
+				if(targetAgent == null)
+				{
+					//search for a new target (might be null anyway, because of distance)
+					targetAgent = SearchForTarget();
+				}
+				else
+				{
+					//check if it's too far
+					if(distanceFromTargetSqr > searchRadius * searchRadius)
+					{
+						//target lost
+						targetAgent = null;
+					}
+				}
+				lastSearchTime = currentTime;
 			}
 		}
 	}

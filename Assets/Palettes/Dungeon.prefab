@@ -2142,7 +2142,7 @@ Tilemap:
       - {fileID: 21300300, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
       - {fileID: 21300298, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
       - {fileID: 21300298, guid: 5b5edcb7f9b804d46b82401930ed42d1, type: 3}
-      m_AnimationSpeed: 0.40232348
+      m_AnimationSpeed: 0.46200246
       m_AnimationTimeOffset: 0
       m_IsLooping: 1
   m_TileAssetArray:

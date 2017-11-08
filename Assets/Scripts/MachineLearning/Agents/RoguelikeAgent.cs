@@ -158,7 +158,7 @@ public class RoguelikeAgent : Agent
 		//DISTANCE CHECK
 		if (targetAgent != null)
 		{
-			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
+			distanceFromTargetSqr = GetDistanceFromTargetSqr();
 			movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rbLocalPosition-rbLocalPosition).normalized); //-1f if moving away, 1f if moving closer
 			
 			if (!isInDanger)
@@ -331,7 +331,7 @@ public class RoguelikeAgent : Agent
 		}
 		if(targetAgent != null)
 		{
-			distanceFromTargetSqr = (targetAgent.transform.localPosition - transform.localPosition).sqrMagnitude;
+			distanceFromTargetSqr = GetDistanceFromTargetSqr();
 		}
 		rbLocalPosition = transform.localPosition;
 		thresholdDistanceFromTargetSqr = Mathf.Infinity;
@@ -360,6 +360,7 @@ public class RoguelikeAgent : Agent
 				else
 				{
 					//check if it's too far
+					distanceFromTargetSqr = GetDistanceFromTargetSqr();
 					if(distanceFromTargetSqr > searchRadius * searchRadius)
 					{
 						//target lost
@@ -375,5 +376,10 @@ public class RoguelikeAgent : Agent
 	{
 		//this is implemented in inheriting classes
 		return null;
+	}
+
+	private float GetDistanceFromTargetSqr()
+	{
+		return (targetAgent.transform.position - transform.position).sqrMagnitude;
 	}
 }

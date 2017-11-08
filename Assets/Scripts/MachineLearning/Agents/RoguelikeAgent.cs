@@ -11,6 +11,7 @@ public class RoguelikeAgent : Agent
 	public float attackCooldown = 1f;
 	public int attackDamage = 5;
 	public float searchRadius = 6f;
+	public bool reducedHealth;
     
 	public int Health {
 		get { return health; }
@@ -174,7 +175,7 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;
+					reward += .1f * (distanceFromTargetSqr + .01f);
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
@@ -200,18 +201,21 @@ public class RoguelikeAgent : Agent
 				isHealing = false;
 			} */
 		}
-		/*else
+		else
 		{
-			//if not attacking, can start healing
-			if(!isHealing
-				&& Health < startingHealth)
+			if (brain.brainType != BrainType.External)
 			{
-				if(brain.brainType != BrainType.External)
+				//if not attacking, can start healing
+				if(!isHealing
+					&& Health < startingHealth)
 				{
-					healCoroutine = StartCoroutine(Heal());
+					if(brain.brainType != BrainType.External)
+					{
+						healCoroutine = StartCoroutine(Heal());
+					}
 				}
 			}
-		}*/
+		}
 	}
 
 	private IEnumerator Heal()
@@ -249,13 +253,9 @@ public class RoguelikeAgent : Agent
 		if(!target.hasBeenHit)
 		{
 			isTargetDead = target.ReceiveDamage(attackDamage);
-			if(isTargetDead)
+			if(isTargetDead && !academy.isInference)
 			{
-				reward += 1f;
-				if(!academy.isInference)
-				{
-					done = true;
-				}
+				done = true;
 			}
 			else
 			{
@@ -316,7 +316,7 @@ public class RoguelikeAgent : Agent
 
 	public override void AgentReset()
 	{
-		Health = startingHealth;
+		Health = (reducedHealth) ? startingHealth / 3 : startingHealth;
 		if(brain.brainType == BrainType.External
 			|| academy.isInference)
 		{

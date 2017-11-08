@@ -189,7 +189,7 @@ public class RoguelikeAgent : Agent
 				isHealing = false;
 			} */
 		}
-		else
+		/*else
 		{
 			//if not attacking, can start healing
 			if(!isHealing
@@ -200,7 +200,7 @@ public class RoguelikeAgent : Agent
 					healCoroutine = StartCoroutine(Heal());
 				}
 			}
-		}
+		}*/
 	}
 
 	private IEnumerator Heal()

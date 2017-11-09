@@ -175,7 +175,7 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f * distanceFromTargetSqr;
+					reward += .1f * (distanceFromTargetSqr + .01f);
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}

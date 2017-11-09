@@ -301,7 +301,7 @@ MonoBehaviour:
   startingHealth: 10
   attackCooldown: 1
   attackDamage: 2
-  searchRadius: 6
+  searchRadius: 8
   preassignedTarget: {fileID: 0}
   targetAgent: {fileID: 0}
 --- !u!114 &114767777583968530

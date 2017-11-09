@@ -279,9 +279,9 @@ MonoBehaviour:
   memory: []
   id: 0
   speed: 3
-  startingHealth: 30
+  startingHealth: 20
   attackCooldown: 1
-  attackDamage: 5
+  attackDamage: 4
   searchRadius: 6
   preassignedTarget: {fileID: 0}
   targetAgent: {fileID: 0}

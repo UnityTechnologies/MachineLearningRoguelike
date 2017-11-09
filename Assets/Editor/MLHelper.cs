@@ -66,7 +66,7 @@ public class MLHelper : EditorWindow
 					mlBrain.brainType = BrainType.External;
 					BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
 					buildPlayerOptions.options = BuildOptions.ShowBuiltPlayer;
-					buildPlayerOptions.scenes = new[] { "Assets/Scenes/Main.unity" };
+					buildPlayerOptions.scenes = new[] { "Assets/Scenes/Training.unity" };
 					buildPlayerOptions.target = BuildTarget.StandaloneOSXUniversal;
 					buildPlayerOptions.locationPathName = "python/ML-Roguelike";
 					BuildPipeline.BuildPlayer(buildPlayerOptions);

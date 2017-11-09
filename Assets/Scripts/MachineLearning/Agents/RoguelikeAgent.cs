@@ -11,7 +11,6 @@ public class RoguelikeAgent : Agent
 	public float attackCooldown = 1f;
 	public int attackDamage = 5;
 	public float searchRadius = 6f;
-	public bool reducedHealth;
     
 	public int Health {
 		get { return health; }
@@ -166,7 +165,7 @@ public class RoguelikeAgent : Agent
 				//pursue
 				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f / (distanceFromTargetSqr + .01f);// * movementTowardsTarget;
+					reward += .1f / (distanceFromTargetSqr + .01f);
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
@@ -175,7 +174,7 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f * (distanceFromTargetSqr + .01f);
+					reward += .1f * distanceFromTargetSqr;
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
@@ -209,6 +208,7 @@ public class RoguelikeAgent : Agent
 				if(!isHealing
 					&& Health < startingHealth)
 				{
+					//we don't heal during training, to avoid confusion
 					if(brain.brainType != BrainType.External)
 					{
 						healCoroutine = StartCoroutine(Heal());
@@ -316,7 +316,7 @@ public class RoguelikeAgent : Agent
 
 	public override void AgentReset()
 	{
-		Health = (reducedHealth) ? startingHealth / 3 : startingHealth;
+		Health = startingHealth;
 		if(brain.brainType == BrainType.External
 			|| academy.isInference)
 		{

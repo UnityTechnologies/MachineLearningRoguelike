@@ -165,8 +165,12 @@ public class RoguelikeAgent : Agent
 				//pursue
 				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f / (distanceFromTargetSqr + .01f);
+					reward += .2f;// / (distanceFromTargetSqr + .01f);
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
+				}
+				else
+				{
+					reward -= .2f;// / (distanceFromTargetSqr + .01f);
 				}
 			}
 			else
@@ -174,8 +178,12 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f * distanceFromTargetSqr;
+					reward += .2f;// * distanceFromTargetSqr;
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
+				}
+				else
+				{
+					reward -= .2f;// * distanceFromTargetSqr;
 				}
 			}
 		}
@@ -189,7 +197,7 @@ public class RoguelikeAgent : Agent
 			}
 			else
 			{
-				reward -= .1f; //penalty for trying to attack when it can't
+				reward = -.1f; //penalty for trying to attack when it can't
 			}
 
 			/* //stop healing, if it was
@@ -259,7 +267,7 @@ public class RoguelikeAgent : Agent
 			}
 			else
 			{
-				reward += .5f;
+				reward = 1f;
 			}
 		}
 
@@ -271,7 +279,7 @@ public class RoguelikeAgent : Agent
         Health -= attackDamage;
 		UIManager.Instance.ShowDamageText(attackDamage, this.transform.position);
 
-		reward -= 1f;
+		reward = -.5f;
 		if(Health <= 0)
 		{
 			Die();

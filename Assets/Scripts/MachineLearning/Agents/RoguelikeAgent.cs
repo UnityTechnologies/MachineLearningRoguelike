@@ -31,15 +31,14 @@ public class RoguelikeAgent : Agent
 	private bool hasToSearchForTarget;
     private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
-	private float searchTargetInterval = 4f;
+	private float searchTargetInterval = 2f;
 	private float lastSearchTime = -10f;
 	private float lastHitTime; //used to verify cooldowns
 	private int doAttackHash, isWalkingHash;
 	private Color originalColour;
 	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
-	private Vector2 startLocalPosition;
-    private Vector2 rbLocalPosition;
+	private Vector2 startPosition;
     private Vector2 movementFactor;
 	private bool isHealing;
 	private Coroutine healCoroutine;
@@ -47,7 +46,6 @@ public class RoguelikeAgent : Agent
 	private float distanceFromTargetSqr;
 	private float thresholdDistanceFromTargetSqr;
 	private HealthBar healthBar;
-	private Transform parentTransform;
 	private RoguelikeAcademy academy;
 
 
@@ -59,10 +57,9 @@ public class RoguelikeAgent : Agent
 		healthBar = transform.GetComponentInChildren<HealthBar>();
 		doAttackHash = Animator.StringToHash("DoAttack");
 		isWalkingHash = Animator.StringToHash("IsWalking");
-		startLocalPosition = transform.localPosition;
+		startPosition = transform.position;
 		originalColour = graphicsSpriteRenderer.color;
 		academy = FindObjectOfType<RoguelikeAcademy>();
-		parentTransform = transform.parent;
 		if(preassignedTarget != null)
 		{
 			targetAgent = preassignedTarget;
@@ -79,8 +76,6 @@ public class RoguelikeAgent : Agent
 	{
 		List<float> state = new List<float>();
 		//Agent data
-		state.Add(rbLocalPosition.x * .1f);
-		state.Add(rbLocalPosition.y * .1f);
 		state.Add(Health * .1f);
 		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
 		state.Add((isHealing) ? 1f : 0f);
@@ -89,8 +84,8 @@ public class RoguelikeAgent : Agent
 		if(targetAgent != null)
 		{
 			state.Add(1f); //does this Agent have an enemy?
-			state.Add(targetAgent.rbLocalPosition.x * .1f);
-			state.Add(targetAgent.rbLocalPosition.y * .1f);
+			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f);
+			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f);
 			state.Add(movementTowardsTarget);
 			state.Add(distanceFromTargetSqr * .001f);
 		}
@@ -149,23 +144,23 @@ public class RoguelikeAgent : Agent
 		//MOVEMENT
 		movementFactor = new Vector2(movementInput.x, movementInput.y) * Time.fixedDeltaTime * speed;
 		rb.position += (Vector2)movementFactor;
-		Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
-		rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;
+		//Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
+		//rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;
 
-		bool isInDanger = Health < startingHealth * .5f;
+		bool isInDanger = Health < startingHealth * .7f;
 
 		//DISTANCE CHECK
 		if (targetAgent != null)
 		{
 			distanceFromTargetSqr = GetDistanceFromTargetSqr();
-			movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rbLocalPosition-rbLocalPosition).normalized); //-1f if moving away, 1f if moving closer
+			movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rb.position-rb.position).normalized); //-1f if moving away, 1f if moving closer
 			
 			if (!isInDanger)
 			{
 				//pursue
 				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .1f / (distanceFromTargetSqr + .01f);
+					reward += 1f / (distanceFromTargetSqr + .01f);
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 			}
@@ -252,14 +247,12 @@ public class RoguelikeAgent : Agent
 
 		if(!target.hasBeenHit)
 		{
+			reward += 1f;
 			isTargetDead = target.ReceiveDamage(attackDamage);
-			if(isTargetDead && !academy.isInference)
+			if(isTargetDead
+				&& !academy.isInference)
 			{
 				done = true;
-			}
-			else
-			{
-				reward += .5f;
 			}
 		}
 
@@ -269,7 +262,7 @@ public class RoguelikeAgent : Agent
     public bool ReceiveDamage(int attackDamage)
     {
         Health -= attackDamage;
-		UIManager.Instance.ShowDamageText(attackDamage, this.transform.position);
+		//IManager.Instance.ShowDamageText(attackDamage, this.transform.position);
 
 		reward -= 1f;
 		if(Health <= 0)
@@ -321,11 +314,11 @@ public class RoguelikeAgent : Agent
 			|| academy.isInference)
 		{
 			//fixed position, only for the trainee - or during gameplay
-			transform.localPosition = startLocalPosition;
+			transform.position = startPosition;
 		}
 		else
 		{
-			//randomised position for players, heuristic (the opponents during training) and during inference
+			//randomised position for players, heuristic (the opponents during training)
 			float offset = academy.startDistance;
 			transform.localPosition = UnityEngine.Random.insideUnitCircle.normalized * offset;
 		}
@@ -333,7 +326,6 @@ public class RoguelikeAgent : Agent
 		{
 			distanceFromTargetSqr = GetDistanceFromTargetSqr();
 		}
-		rbLocalPosition = transform.localPosition;
 		thresholdDistanceFromTargetSqr = Mathf.Infinity;
 	}
 

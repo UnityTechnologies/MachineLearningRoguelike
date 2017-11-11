@@ -26,14 +26,16 @@ public class RoguelikeRandomDecision : MonoBehaviour, Decision {
 		{
 			act = new float[1];
 
-			if(Random.Range(0f, 1f) > .01f)
+			if(Random.Range(0f, 1f) > .03f)
 			{
+				//97% possibility of moving
 				//move
 				//act[0] = (float)Random.Range(0, 4); //from 0 to 3
-				act[0] = 0;
+				act[0] = 0; //forced to 0, which means stay still - for better training
 			}
 			else
 			{
+				//3% possibility of attacking
 				//attack
 				act[0] = 5f;
 			}

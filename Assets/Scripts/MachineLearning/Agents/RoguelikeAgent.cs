@@ -28,7 +28,7 @@ public class RoguelikeAgent : Agent
 	[SerializeField]
 	private RoguelikeAgent targetAgent;
 
-	private bool hasToSearchForTarget;
+	private bool hasToSearchForTarget = false;
     private int health;
 	private float damageCooldown = 1f; //invincibility cooldown after a hit
 	private float searchTargetInterval = 2f;
@@ -270,7 +270,7 @@ public class RoguelikeAgent : Agent
     public bool ReceiveDamage(int attackDamage)
     {
         Health -= attackDamage;
-		//IManager.Instance.ShowDamageText(attackDamage, this.transform.position);
+		//UIManager.Instance.ShowDamageText(attackDamage, this.transform.position);
 
 		reward = -.5f;
 		if(Health <= 0)

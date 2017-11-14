@@ -42,11 +42,12 @@ public class RoguelikeAgent : Agent
     private Vector2 movementFactor;
 	private bool isHealing;
 	private Coroutine healCoroutine;
-	private float movementTowardsTarget;
+	//private float movementTowardsTarget;
 	private float distanceFromTargetSqr;
 	private float thresholdDistanceFromTargetSqr;
 	private HealthBar healthBar;
 	private RoguelikeAcademy academy;
+	private bool isInDanger;
 
 
     public override void InitializeAgent()
@@ -78,21 +79,19 @@ public class RoguelikeAgent : Agent
 		//Agent data
 		state.Add(Health * .1f);
 		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
-		state.Add((isHealing) ? 1f : 0f);
+		state.Add((isInDanger) ? 1f : 0f); //is it better to attack or to run?
 
 		//Enemy data
 		if(targetAgent != null)
 		{
 			state.Add(1f); //does this Agent have an enemy?
-			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f);
-			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f);
-			state.Add(movementTowardsTarget);
+			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f); //direction to the enemy on the X
+			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f); //direction to the enemy on the Y
 			state.Add(distanceFromTargetSqr * .001f);
 		}
 		else
 		{
 			//enemy data is set to zero
-			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
@@ -147,25 +146,25 @@ public class RoguelikeAgent : Agent
 		//Vector2 parentPos = (parentTransform != null) ? (Vector2)parentTransform.position : Vector2.zero; //calculating parent offset for obtaining local RB coordinates below
 		//rbLocalPosition = (Vector2)rb.position - parentPos + movementFactor;
 
-		bool isInDanger = Health < startingHealth * .7f;
+		isInDanger = Health < startingHealth * .7f;
 
 		//DISTANCE CHECK
 		if (targetAgent != null)
 		{
 			distanceFromTargetSqr = GetDistanceFromTargetSqr();
-			movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rb.position-rb.position).normalized); //-1f if moving away, 1f if moving closer
+			//movementTowardsTarget = Vector2.Dot(movementInput.normalized, (targetAgent.rb.position-rb.position).normalized); //-1f if moving away, 1f if moving closer
 			
 			if (!isInDanger)
 			{
 				//pursue
 				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;// / (distanceFromTargetSqr + .01f);
+					reward += .2f;
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 				else
 				{
-					reward -= .2f;// / (distanceFromTargetSqr + .01f);
+					reward -= .2f;
 				}
 			}
 			else
@@ -173,12 +172,12 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;// * distanceFromTargetSqr;
+					reward += .2f;
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 				else
 				{
-					reward -= .2f;// * distanceFromTargetSqr;
+					reward -= .2f;
 				}
 			}
 		}
@@ -205,19 +204,17 @@ public class RoguelikeAgent : Agent
 		}
 		else
 		{
+			//we don't heal during training, to avoid confusion
 			if (brain.brainType != BrainType.External)
 			{
 				//if not attacking, can start healing
+			}
+			
 				if(!isHealing
 					&& Health < startingHealth)
 				{
-					//we don't heal during training, to avoid confusion
-					if(brain.brainType != BrainType.External)
-					{
-						healCoroutine = StartCoroutine(Heal());
-					}
+					healCoroutine = StartCoroutine(Heal());
 				}
-			}
 		}
 	}
 

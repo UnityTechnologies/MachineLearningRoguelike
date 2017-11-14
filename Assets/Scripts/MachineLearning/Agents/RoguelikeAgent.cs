@@ -87,7 +87,7 @@ public class RoguelikeAgent : Agent
 			state.Add(1f); //does this Agent have an enemy?
 			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f); //direction to the enemy on the X
 			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f); //direction to the enemy on the Y
-			state.Add(distanceFromTargetSqr * .001f);
+			//state.Add(distanceFromTargetSqr * .001f);
 		}
 		else
 		{
@@ -95,7 +95,7 @@ public class RoguelikeAgent : Agent
 			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
-			state.Add(0f);
+			//state.Add(0f);
 		}
 		return state;
 	}
@@ -159,12 +159,12 @@ public class RoguelikeAgent : Agent
 				//pursue
 				if(distanceFromTargetSqr < thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;
+					reward += .04f;	//.2f
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 				else
 				{
-					reward -= .2f;
+					reward -= .02f;	//-.2f
 				}
 			}
 			else
@@ -172,12 +172,12 @@ public class RoguelikeAgent : Agent
 				//retreat
 				if(distanceFromTargetSqr > thresholdDistanceFromTargetSqr)
 				{
-					reward += .2f;
+					reward += .04f;	//.2f
 					thresholdDistanceFromTargetSqr = distanceFromTargetSqr;
 				}
 				else
 				{
-					reward -= .2f;
+					reward -= .02f;	//-.2f
 				}
 			}
 		}
@@ -185,22 +185,23 @@ public class RoguelikeAgent : Agent
 		//ATTACK
 		if(attack)
 		{
-			if(canAttack)
+			/*if(canAttack)
 			{
 				StartCoroutine(DoAttack());
 			}
 			else
 			{
 				reward = -.1f; //penalty for trying to attack when it can't
-			}
+			}*/
 
-			/* //stop healing, if it was
-			if(isHealing)
+			if (distanceFromTargetSqr <= 3.5f)
 			{
-				StopCoroutine(healCoroutine);
-				reward -= .5f;
-				isHealing = false;
-			} */
+				StartCoroutine(DoAttack());
+			}
+			else
+			{
+				reward = -.1f;
+			}
 		}
 		else
 		{
@@ -208,13 +209,12 @@ public class RoguelikeAgent : Agent
 			if (brain.brainType != BrainType.External)
 			{
 				//if not attacking, can start healing
-			}
-			
 				if(!isHealing
 					&& Health < startingHealth)
 				{
 					healCoroutine = StartCoroutine(Heal());
 				}
+			}
 		}
 	}
 
@@ -339,7 +339,7 @@ public class RoguelikeAgent : Agent
 		
 	}
 
-	private void Update()
+	/*private void Update()
 	{
 		animator.SetBool(isWalkingHash, movementFactor != Vector2.zero);
 
@@ -367,7 +367,7 @@ public class RoguelikeAgent : Agent
 				lastSearchTime = currentTime;
 			}
 		}
-	}
+	}*/
 
 	protected virtual RoguelikeAgent SearchForTarget()
 	{

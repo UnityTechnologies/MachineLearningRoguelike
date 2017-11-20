@@ -5,23 +5,22 @@ using UnityEngine;
 
 public class RoguelikeAgent : Agent
 {
+	// all variables affecting the behaviour of the agents
 	[Header("Roguelike specific")]
 	public int speed = 100;
 	public int startingHealth = 100;
 	public float attackCooldown = 1f;
 	public int attackDamage = 5;
 	public float searchRadius = 6f;
-    
 	public int Health {
 		get { return health; }
 		set { health = value; healthBar.SetHealth(health, startingHealth); }
 	}
 	public RoguelikeAgent preassignedTarget;
 
-
     protected Rigidbody2D rb;
 	protected Animator animator;
-	protected Vector2 movementInput; //cached input coming from the Brain
+	protected Vector2 movementInput; // cached input coming from the Brain
 	protected SpriteRenderer graphicsSpriteRenderer;
 
     [Header("Debug stuff")]
@@ -30,26 +29,25 @@ public class RoguelikeAgent : Agent
 
 	private bool hasToSearchForTarget = false;
     private int health;
-	private float damageCooldown = 1f; //invincibility cooldown after a hit
+	private float damageCooldown = 1f; // invincibility cooldown after a hit
 	private float searchTargetInterval = 2f;
 	private float lastSearchTime = -10f;
-	private float lastHitTime; //used to verify cooldowns
+	private float lastHitTime; // used to verify cooldowns
 	private int doAttackHash, isWalkingHash;
 	private Color originalColour;
-	private bool canAttack = true; //put to false when attacking, restored to true after the attackCooldown
+	private bool canAttack = true; // set to false when attacking, restored to true after the attackCooldown
     private bool hasBeenHit = false;
 	private Vector2 startPosition;
     private Vector2 movementFactor;
 	private bool isHealing;
 	private Coroutine healCoroutine;
-	//private float movementTowardsTarget;
 	private float distanceFromTargetSqr;
 	private float thresholdDistanceFromTargetSqr;
 	private HealthBar healthBar;
 	private RoguelikeAcademy academy;
 	private bool isInDanger;
 
-
+	
     public override void InitializeAgent()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -67,35 +65,33 @@ public class RoguelikeAgent : Agent
 		}
 		else
 		{
-			hasToSearchForTarget = true; //targetAgent will be looked for in the Update
+			hasToSearchForTarget = true; // targetAgent will be looked for in the Update
 		}
 		
-		AgentReset(); //will reset some key variables
+		AgentReset(); // will reset some key variables
 	}
 
 	public override List<float> CollectState()
 	{
 		List<float> state = new List<float>();
-		//Agent data
+		// Agent data
 		state.Add(Health * .1f);
-		state.Add((canAttack) ? 1f : 0f); //can this Agent attack? (due to attack cooldown)
-		state.Add((isInDanger) ? 1f : 0f); //is it better to attack or to run?
+		state.Add((canAttack) ? 1f : 0f); // can this Agent attack? (due to attack cooldown)
+		state.Add((isInDanger) ? 1f : 0f); // is it better to attack or to run?
 
-		//Enemy data
+		// Enemy data
 		if(targetAgent != null)
 		{
-			state.Add(1f); //does this Agent have an enemy?
-			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f); //direction to the enemy on the X
-			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f); //direction to the enemy on the Y
-			//state.Add(distanceFromTargetSqr * .001f);
+			state.Add(1f); // does this Agent have an enemy?
+			state.Add((targetAgent.rb.position.x - rb.position.x) * .1f); // direction to the enemy on the X
+			state.Add((targetAgent.rb.position.y - rb.position.y) * .1f); // direction to the enemy on the Y 
 		}
 		else
 		{
-			//enemy data is set to zero
+			// enemy data is set to zero
 			state.Add(0f);
 			state.Add(0f);
 			state.Add(0f);
-			//state.Add(0f);
 		}
 		return state;
 	}
@@ -339,7 +335,7 @@ public class RoguelikeAgent : Agent
 		
 	}
 
-	/*private void Update()
+	private void Update()
 	{
 		animator.SetBool(isWalkingHash, movementFactor != Vector2.zero);
 
@@ -367,7 +363,7 @@ public class RoguelikeAgent : Agent
 				lastSearchTime = currentTime;
 			}
 		}
-	}*/
+	}
 
 	protected virtual RoguelikeAgent SearchForTarget()
 	{

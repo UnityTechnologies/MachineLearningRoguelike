@@ -30,6 +30,6 @@ Required: Laptop
 
 **Owner and Responsible Devs**
 
-Owners: Ciro Continisio, Alessia Nigretti
+Owners: Ciro Continisio (ciro@unity3d.com), Alessia Nigretti (alessian@unity3d.com)
 
 **Change Log**

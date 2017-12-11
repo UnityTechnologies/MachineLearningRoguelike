@@ -19,10 +19,10 @@ To try out the project, you need to add the [Tensorflow Sharp plugin](https://s3
 To be able to train the agents, make sure that the Python API is installed in your system. [This](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/installation.md) is a guide on how to do it. Then, add the [python folder](https://github.com/Unity-Technologies/ml-agents/tree/master/python) from the Machine Learning Agents repository to the project (outside the Assets folder).<br><br>
 Refer to the [Machine Learning Agents wiki](https://github.com/Unity-Technologies/ml-agents) for further instructions on how to set up the project for external training.<br>
 
-**Extra Material**
+**Extra Materials**
 
-Information on how this project was created is available on the Blog Post (*link available soon*).<br>
-Slides: ![Link](https://docs.google.com/presentation/d/1Cs2r8eRLkcjqyKXUT5O96VAZ7NsvlNmSI1eFbGFhx3w/edit)<br>
+Information on how this project was created is available on the [blog post](https://blogs.unity3d.com/2017/12/11/using-machine-learning-agents-in-a-real-game-a-beginners-guide/).<br>
+Slides: [Link](https://docs.google.com/presentation/d/1Cs2r8eRLkcjqyKXUT5O96VAZ7NsvlNmSI1eFbGFhx3w/edit)<br>
 Talk video: (*link available soon*).
 
 **Software Requirements**
@@ -36,8 +36,10 @@ Required: Any computer (Win or Mac)
 **Owner and Responsible Devs**
 
 Owners: Alessia Nigretti (alessian@unity3d.com), Ciro Continisio (ciro@unity3d.com)
+Original graphics: Michele "Buch" Bucelli on [OpenGameArt](https://opengameart.org/content/a-blocky-dungeon) under CC0 License
 
 **Major Change Log**
 - 24 Oct: Created repository
 - 14 Nov: First real working copy
 - 27 Nov: Updated for public use, added license, Readme
+- 11 Dec: Repository is public

@@ -22,8 +22,8 @@ Refer to the [Machine Learning Agents wiki](https://github.com/Unity-Technologie
 **Extra Materials**
 
 Information on how this project was created is available on the [blog post](https://blogs.unity3d.com/2017/12/11/using-machine-learning-agents-in-a-real-game-a-beginners-guide/).<br>
-Slides: [Link](https://docs.google.com/presentation/d/1Cs2r8eRLkcjqyKXUT5O96VAZ7NsvlNmSI1eFbGFhx3w/edit)<br>
-Talk video: (*link available soon*).
+Slides: [Link](https://docs.google.com/presentation/d/1Cs2r8eRLkcjqyKXUT5O96VAZ7NsvlNmSI1eFbGFhx3w/edit).<br>
+Talk video: [Link](https://www.youtube.com/watch?v=ZIHJ28oz3hk).
 
 **Software Requirements**
 

@@ -67,7 +67,7 @@ public class MLHelper : EditorWindow
 					BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
 					buildPlayerOptions.options = BuildOptions.ShowBuiltPlayer;
 					buildPlayerOptions.scenes = new[] { "Assets/Scenes/Training.unity" };
-					buildPlayerOptions.target = BuildTarget.StandaloneOSXUniversal;
+					buildPlayerOptions.target = BuildTarget.StandaloneOSX;
 					buildPlayerOptions.locationPathName = "python/ML-Roguelike";
 					BuildPipeline.BuildPlayer(buildPlayerOptions);
 				}

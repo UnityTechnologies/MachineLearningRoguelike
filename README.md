@@ -17,7 +17,7 @@ This project is intended to demonstrate a practical application of the Machine L
 
 Please note that this project is using v0.2.1d of Unity ML-Agents.
 
-To try out the project, you need to add the [Tensorflow Sharp plugin](https://s3.amazonaws.com/unity-agents/TFSharpPlugin.unitypackage) to your Assets folder. More information on how to set up Tensorflow Sharp Support is provided [here](https://github.com/Unity-Technologies/ml-agents/blob/0.2.1d/docs/Getting-Started-with-Balance-Ball.md).<br> 
+To try out the project, you need to add the [Tensorflow Sharp plugin](https://s3.amazonaws.com/unity-ml-agents/0.5/TFSharpPlugin.unitypackage) to your Assets folder. More information on how to set up Tensorflow Sharp Support is provided [here](https://github.com/Unity-Technologies/ml-agents/blob/0.2.1d/docs/Getting-Started-with-Balance-Ball.md).<br> 
 To be able to train the agents, make sure that the Python API is installed in your system. [This](https://github.com/Unity-Technologies/ml-agents/blob/0.2.1d/docs/installation.md) is a guide on how to do it. Then, add the [python folder](https://github.com/Unity-Technologies/ml-agents/blob/0.2.1d/python) from the Machine Learning Agents repository to the project (outside the Assets folder).<br><br>
 Refer to the [Machine Learning Agents wiki](https://github.com/Unity-Technologies/ml-agents/tree/0.2.1d) for further instructions on how to set up the project for external training.<br>
 

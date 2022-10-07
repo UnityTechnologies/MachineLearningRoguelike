@@ -466,7 +466,7 @@ namespace UnityEditor
 	}
 
 	[CustomEditor(typeof(GameObjectBrush))]
-	public class GameObjectBrushEditor : GridBrushEditorBase
+	public class GameObjectBrushEditor : UnityEditor.Tilemaps.GridBrushEditorBase
 	{
 		public GameObjectBrush brush { get { return target as GameObjectBrush; } }
 
